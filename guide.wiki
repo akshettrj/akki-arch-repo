@@ -1,0 +1,43 @@
+= Build your own Arch Repository for Pacman =
+
+We will create a new package repo for Pacman package manager which will work
+without any AUR helper. I am not gonna sign my packages because I don't know
+how to.
+
+
+
+== Creating the database for the repository ==
+
+1. Add all the compressed packages to appropriate architecture folders. For
+   example, in a `x86_64` folder, add all the `x86_64` packages.
+2. Then generate a database file using the command:
+    {{{sh
+    repo-add akki-arch-repo.db.tar.gz *.pkg.tar.zst
+    }}}
+   Here, the `akki-arch-repo` is the name of the repo which will be identified
+   by Pacman.
+3. It will create 4 files:
+    1. `akki-arch-repo.db.tar.gz`: The database file.
+    2. `akki-arch-repo.files.tar.gz`: The files of the repo
+    3. `akki-arch-repo.db`: Symlink to the database file.
+    4. `akki-arch-repo.files`: Symlink to the files of the repo
+4. These symlinks will not go on a git repository.
+5. So just delete the symlinks and rename the files to that of the symlinks
+6. Then just commit and push the new files to the git repository.
+
+== Adding the Repo to Pacman ==
+
+1. You will have to edit the file `/etc/pacman.conf` and add the following
+   lines:
+    {{{
+    [akki-arch-repo]
+    SigLevel = Optional DatabaseOptional
+    Server = https://raw.githubusercontent.com/akshettrj/$repo/main/$arch
+    }}}
+2. The Server link should be a *raw* link from whichever Git host you are using
+3. For GitLab, it will be: `https://gitlab.com/akshettrj/$repo/-/raw/main/$arch`
+
+
+----
+
+Thanks to Distrotube for amazing tutorials.
